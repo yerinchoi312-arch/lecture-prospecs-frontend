@@ -3,7 +3,7 @@ import { Link, useLocation } from "react-router";
 import useLayoutStore from "../../store/useLayoutStore.ts";
 import { useEffect, useState } from "react";
 import { twMerge } from "tailwind-merge";
-import { IoMenu } from "react-icons/io5";
+import { IoMenu, IoSearch } from "react-icons/io5";
 
 const MENU = [
     {
@@ -79,6 +79,9 @@ function Header() {
         window.addEventListener("scroll", handleScroll);
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
+
+    const [hoveredMenu, setHoveredMenu] = useState<string | null>(null);
+    const isMenuOpen = hoveredMenu !== null;
     // 사용자가 홈에 위치할때만 true
     const isHome = pathname === "/";
 
@@ -87,12 +90,16 @@ function Header() {
 
     return (
         <header
+            //onMouseLeave : 이 요소에서 마우스가 떠나게 되면 발동되는 함수
+            //onMouseEnter : 이 요소에서 마우스가 들어오면 발동되는 함수
+            onMouseLeave={() => setHoveredMenu(null)}
             className={twMerge(
                 ["fixed", "left-0", "right-0", "z-60"],
                 ["transition-all", "duration-300", "border-b"],
                 isTransparent
                     ? ["bg-transparent", "border-transparent", "text-white"]
                     : ["bg-white", "border-gray-100"],
+                isMenuOpen && ["bg-white", "border-gray-100", "text-gray-600", "duration-0"],
                 isTopBannerVisible ? ["top-9"] : ["top-0"],
             )}>
             <div
@@ -105,7 +112,7 @@ function Header() {
                     <button className={twMerge(["lg:hidden", "text-2xl"])}>
                         <IoMenu />
                     </button>
-                    <Link to={"/"}>
+                    <Link to={"/"} className={"w-40"}>
                         <img src={Logo} alt={"logo"} />
                     </Link>
                     <nav
@@ -117,66 +124,125 @@ function Header() {
                         {/*메뉴 구성*/}
                         {MENU.map(menu => (
                             <div
+                                onMouseEnter={() => setHoveredMenu(menu.name)}
                                 key={menu.name}
                                 className={twMerge(
-                                    ["relative", "group"],
+                                    ["relative", "w-30"],
                                     ["h-full", "flex", "items-center"],
                                 )}>
                                 <Link
                                     key={menu.name}
                                     to={menu.path}
                                     className={twMerge(
-                                        ["group", "relative"],
+                                        ["relative"],
                                         ["py-4", "hover:text-red-600", "transition-colors"],
                                     )}>
                                     {menu.name}
                                     <span
                                         className={twMerge(
-                                            ["absolute", "bottom-0", "left-0"],
-                                            ["w-0", "h-[2px]"],
+                                            ["absolute", "bottom-0", "left-0", "h-[2px]"],
+                                            hoveredMenu === menu.name ? "w-full" : "w-0",
                                             ["bg-red-600", "transition-all", "duration-300"],
-                                            ["group-hover:w-full"],
                                         )}
                                     />
                                 </Link>
-                                {/*펼침 메뉴*/}
-                                {menu.subMenu.length > 0 && (
-                                    <ul
-                                        className={twMerge(
-                                            ["absolute", "top-full", "left-1/2"],
-                                            ["-translate-x-1/2"],
-                                            ["group", "bg-white", "border", "border-gray-100"],
-                                            ["opacity-0", "group-hover:opacity-100"],
-                                            ["invisible", "group-hover:visible"],
-                                            ["transition-all", "duration-300", "w-40"],
-                                        )}>
-                                        {menu.subMenu.map(subMenu => (
-                                            <li
-                                                key={subMenu.name}
-                                                className={twMerge(["text-center"])}>
-                                                <Link
-                                                    to={subMenu.path}
-                                                    className={twMerge([
-                                                        "block",
-                                                        "py-3",
-                                                        "text-sm",
-                                                        "text-gray-600",
-                                                        "hover:text-red-600",
-                                                        "transition-all",
-                                                    ])}>
-                                                    {subMenu.name}
-                                                </Link>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                )}
                             </div>
                         ))}
                     </nav>
                 </div>
 
                 {/*오른쪽영역*/}
-                <div className={twMerge(["flex", "items-center"])}></div>
+                <div className={twMerge(["w-100", "flex", "justify-end", "items-center","gap-3"])}>
+                    <div className={twMerge(["relative", "hidden", "md:block"])}>
+                        <input
+                            className={twMerge(
+                                ["w-40", "py-1"],
+                                ["border-b", "border-black"],
+                                ["focus:w-60", "focus:outline-none"],
+                                ["transition-all"],
+                                isTransparent
+                                    ? [
+                                          "bg-transparent",
+                                          "border-white",
+                                          "text-white",
+                                          "placeholder:text-white",
+                                      ]
+                                    : ["border-black"],
+                                isMenuOpen && ["border-black"],
+                            )}
+                            placeholder={"검색"}
+                        />
+                        <button className={twMerge(["absolute", "right-0", "top-2"])}>
+                            <IoSearch />
+                        </button>
+                    </div>
+                    <Link
+                        to={"/login"}
+                        className={twMerge(["text-sm", "font-bold", "hidden", "md:block"])}>
+                        LOGIN
+                    </Link>
+                    <Link
+                        to={"/cart"}
+                        className={twMerge(["text-sm", "font-bold", "hidden", "md:block"])}>
+                        CART
+                    </Link>
+                </div>
+            </div>
+
+            {/*메가 메뉴*/}
+            {/*TopHeader 있을때 없을때 2가지 요소 존재
+            TopHeader 높이는 36px (9) Header 높이는 80px (20)
+            */}
+            <div
+                className={twMerge(
+                    ["absolute", "left-0", "w-full", "overflow-hidden", "z-50"],
+                    isTopBannerVisible ? "top-17" : "top-11",
+                    ["border-t", "border-gray-100"],
+                    ["bg-white", "text-gray-600"],
+                    ["transition-all", "duration-300"],
+                    isMenuOpen
+                        ? ["h-64", "opacity-100", "border-b"]
+                        : ["h-0", "opacity-0", "border-none"],
+                )}>
+                <div
+                    className={twMerge(
+                        ["container", "mx-auto", "px-4"],
+                        ["flex", "justify-between"],
+                    )}>
+                    {/*왼쪽영역*/}
+                    <div className={twMerge(["flex", "items-center", "gap-5"])}>
+                        <div className={twMerge(["w-40", "invisible"])} />
+                        <div
+                            className={twMerge(
+                                ["hidden", "lg:flex", "flex-1"],
+                                ["justify-center", "gap-10"],
+                                ["font-bold"],
+                            )}>
+                            {/*메뉴 구성*/}
+                            {MENU.map(menu => (
+                                <ul
+                                    key={menu.name}
+                                    className={twMerge(["flex", "flex-col", "gap-3", "w-30"])}>
+                                    {menu.subMenu.map(subMenu => (
+                                        <li key={subMenu.name} className={twMerge()}>
+                                            <Link
+                                                to={subMenu.path}
+                                                className={twMerge(
+                                                    ["py-2", "block", "text-sm", "text-gray-500"],
+                                                    ["hover:text-red-600"],
+                                                )}>
+                                                {subMenu.name}
+                                            </Link>
+                                        </li>
+                                    ))}
+                                </ul>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/*오른쪽영역*/}
+                    <div className={twMerge(["w-100", "invisible"])}></div>
+                </div>
             </div>
         </header>
     );
