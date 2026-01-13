@@ -1,4 +1,9 @@
+import { twMerge } from "tailwind-merge";
+import MainVisual from "../components/home/MainVisual.tsx";
+
 function Home() {
-    return <div className={"h-[200dvh] bg-gray-200 "}></div>
+    return <div className={twMerge(["min-h-screen","flex","flex-col"])}>
+        <MainVisual/>
+    </div>
 }
 export default Home
