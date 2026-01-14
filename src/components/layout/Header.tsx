@@ -94,7 +94,7 @@ function Header() {
             //onMouseEnter : 이 요소에서 마우스가 들어오면 발동되는 함수
             onMouseLeave={() => setHoveredMenu(null)}
             className={twMerge(
-                ["fixed", "left-0", "right-0", "z-60"],
+                ["sticky", "left-0", "right-0", "z-60"],
                 ["transition-all", "duration-300", "border-b"],
                 isTransparent
                     ? ["bg-transparent", "border-transparent", "text-white"]

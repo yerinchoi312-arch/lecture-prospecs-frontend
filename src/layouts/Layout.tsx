@@ -11,7 +11,7 @@ function Layout() {
         <div className={twMerge(["min-h-screen", "flex", "flex-col"])}>
             {/*TopHeader는 처음에는 fixed
             사용자가 스크롤을 조금이라도 내리게 되면 화면에서 사라짐*/}
-            <div className={twMerge(["fixed", "top-0", "left-0", "right-0", "z-index-60"])}>
+            <div className={twMerge(["sticky", "top-0", "left-0", "right-0", "z-60"])}>
                 <TopHeader />
             </div>
             {/*
