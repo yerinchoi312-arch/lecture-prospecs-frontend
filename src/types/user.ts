@@ -6,7 +6,7 @@ export interface RegisterFormType {
     phone:string;
     emailOptIn:boolean;
     smsOptIn:boolean;
-    birthDate: string;
+    birthdate: string;
     gender:"MALE" | "FEMALE";
     zipCode?: string;
     address1?: string;
@@ -19,9 +19,19 @@ export interface User {
     phone:string;
     emailOptIn:boolean;
     smsOptIn:boolean;
-    birthDate: string;
+    birthdate: string;
     gender:"MALE" | "FEMALE";
     zipCode?: string;
     address1?: string;
     address2?: string;
+}
+export interface LoginFormType {
+    email: string;
+    password: string;
+}
+
+export interface LoginResponse {
+    message: string;
+    token: string;
+    user: User;
 }

@@ -128,8 +128,8 @@ function Register() {
                             type={"text"}
                             placeholder={"생년월일 (YYYYMMDD)"}
                             maxLength={8}
-                            error={errors.birthDate}
-                            registration={register("birthDate", {
+                            error={errors.birthdate}
+                            registration={register("birthdate", {
                                 required: "생년월일은 필수값입니다.",
                                 minLength: { value: 8, message: "8자리로 입력해주세요" },
                                 maxLength: { value: 8, message: "8자리로 입력해주세요" },
