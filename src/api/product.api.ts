@@ -1,5 +1,6 @@
 import { httpClient } from "./axios.ts";
 import qs from "qs";
+import type {ProductListResponse} from "../types/product.ts";
 
 export interface GetProductsParams{
     page?: number;
@@ -9,8 +10,9 @@ export interface GetProductsParams{
     genders?:string[];
     sizes?:string[];
 }
+
 export const getProducts= async (data:GetProductsParams) => {
-    const response = await httpClient.get("/products",{
+    const response = await httpClient.get<ProductListResponse>("/products",{
         params:data,
         paramsSerializer:params => qs.stringify(params,{arrayFormat:"repeat"}),
     });
