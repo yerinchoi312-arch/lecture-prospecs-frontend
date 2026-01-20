@@ -7,7 +7,7 @@ import Breadcrumbs from "../../components/common/Breadcrumbs.tsx";
 import { getProducts, type GetProductsParams } from "../../api/product.api.ts";
 import type { Product } from "../../types/product.ts";
 import ProductCard from "../../components/shop/ProductCard.tsx";
-import {FILTER_STYLES} from "../../types/productFilter.ts";
+import { FILTER_GENDERS, FILTER_SIZES, FILTER_STYLES } from "../../types/productFilter.ts";
 
 function ProductListPage() {
     const { id } = useParams<{ id: string }>();
@@ -17,10 +17,9 @@ function ProductListPage() {
     const [products, setProducts] = useState<Product[]>([]);
 
     //필터 관련 state
-    const [selectedStyles,setSelectedStyles] = useState<string[]>([]);
-    const [selectedGenders,setSelectedGenders] = useState<string[]>([]);
-    const [selectedSizes,setSelectedSizes] = useState<string[]>([]);
-
+    const [selectedStyles, setSelectedStyles] = useState<string[]>([]);
+    const [selectedGenders, setSelectedGenders] = useState<string[]>([]);
+    const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
 
     //Category에 대한 요청
     useEffect(() => {
@@ -48,7 +47,9 @@ function ProductListPage() {
                     page: 1,
                     limit: 40,
                     categoryId: Number(id),
-                    styles:selectedStyles
+                    styles: selectedStyles,
+                    genders: selectedGenders,
+                    sizes: selectedSizes,
                 };
                 const response = await getProducts(params);
                 setProducts(response.data);
@@ -59,44 +60,44 @@ function ProductListPage() {
             }
         };
         fetchProduct().then(() => {});
-    }, [id , selectedStyles, selectedGenders, selectedSizes]);
+    }, [id, selectedStyles, selectedGenders, selectedSizes]);
 
-    const handleFilterChange = (type:"styles" | "genders" | "sizes", value:string) => {
+    const handleFilterChange = (type: "styles" | "genders" | "sizes", value: string) => {
         switch (type) {
             case "styles":
                 //array에 있는 includes 메소드 => 단순하게 이 안에 값이 포함되어져 있는지 확일할 때 쓰는 메소드
                 //array에 있는 find,some, 메소드는 array 안에 있는 요소가 객체일 때 사용.
                 //includes는 진짜 값만으로 찾아야 하고 find,some 메소드는 함수를 통해 그 요소를 꺼내서 비교할 수 있기 때문
-                if (selectedStyles.includes(value)){
+                if (selectedStyles.includes(value)) {
                     //빼야하는거
-                    setSelectedStyles(selectedStyles.filter(item=> item !== value))
-                }else{
+                    setSelectedStyles(selectedStyles.filter(item => item !== value));
+                } else {
                     //덧붙여줘야함
                     setSelectedStyles([...selectedStyles, value]);
                 }
                 break;
             case "genders":
-                if (selectedGenders.includes(value)){
-                    setSelectedGenders(selectedGenders.filter(item=> item !== value))
-                }else {
+                if (selectedGenders.includes(value)) {
+                    setSelectedGenders(selectedGenders.filter(item => item !== value));
+                } else {
                     setSelectedGenders([...selectedGenders, value]);
                 }
                 break;
             case "sizes":
-                if (selectedSizes.includes(value)){
-                    setSelectedSizes(selectedSizes.filter(item=> item !== value))
-                }else {
+                if (selectedSizes.includes(value)) {
+                    setSelectedSizes(selectedSizes.filter(item => item !== value));
+                } else {
                     setSelectedSizes([...selectedSizes, value]);
                 }
                 break;
         }
-    }
+    };
 
     const handleReset = () => {
         setSelectedStyles([]);
         setSelectedGenders([]);
         setSelectedSizes([]);
-    }
+    };
     return (
         <div className={twMerge(["max-w-400", "mx-auto", "py-10"])}>
             {/*상단 카테고리 헤더*/}
@@ -116,74 +117,50 @@ function ProductListPage() {
                 </div>
             </div>
             {/*상품 목록 관련*/}
-            <div className={twMerge(["flex","mt-4"])}>
+            <div className={twMerge(["flex", "mt-4"])}>
                 {/*상품 관련 필터*/}
                 <div className={twMerge(["w-64"])}>
-                    <aside className={twMerge(["w-64","pr-8","space-y-10","h-fit"])}>
-                        <div className={twMerge(["flex","justify-between","items-center","pb-4"],
-                            ["border-b","border-gray-500"])}>
+                    <aside className={twMerge(["w-64", "pr-8", "space-y-10", "h-fit"])}>
+                        <div
+                            className={twMerge(
+                                ["flex", "justify-between", "items-center", "pb-4"],
+                                ["border-b", "border-gray-500"],
+                            )}>
                             <h2 className={"font-bold text-lg"}>FILTER</h2>
-                            <button className={"text-xs text-gray-500"} onClick={handleReset}>초기화</button>
+                            <button
+                                className={"text-xs text-gray-500 cursor-pointer"}
+                                onClick={handleReset}>
+                                초기화
+                            </button>
                         </div>
                         {/*필터 관련*/}
-                        <div className={twMerge(["flex","flex-col"])}>
-                            {/*style 시작*/}
-                            <div className={twMerge(["space-y-4"])}>
-                                <h3 className={"font-bold text-sm"}>종류</h3>
-                                <div className={twMerge(["space-y-2","pr-2"])}>
-                                    {FILTER_STYLES.map((style , index)=> (
-                                        <label key={index} className={twMerge(["flex","items-center","gap-3","cursor-pointer"])}>
-                                            <input type={"checkbox"} className={" h-4 w-4 rounded"} onChange={()=>handleFilterChange("styles",style.value)}/>
-                                            <span className={"text-sm text-gray-600"}>{style.label}</span>
-                                        </label>
-                                        ))}
-                                </div>
-                            </div>
-                        </div>
+                        <FilterBox
+                            title={"종류"}
+                            type={"styles"}
+                            data={FILTER_STYLES}
+                            selectedValue={selectedStyles}
+                            onChange={handleFilterChange}
+                        />
+                        <FilterBox
+                            title={"성별"}
+                            type={"genders"}
+                            data={FILTER_GENDERS}
+                            selectedValue={selectedGenders}
+                            onChange={handleFilterChange}
+                        />
+                        <FilterButtonBox
+                            onChange={handleFilterChange}
+                            selectedSizes={selectedSizes}
+                        />
                     </aside>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
                 </div>
                 {/*상품 목록 */}
                 <div className={twMerge(["flex-1"])}>
                     {products.length > 0 ? (
-                        <div className={twMerge(["flex", "flex-wrap","gap-y-3"])}>
-                            {products.map((product , index)=>(
-                                <div key={index} className={twMerge(["w-1/4","px-3"])}>
-                                    <ProductCard product={product}/>
+                        <div className={twMerge(["flex", "flex-wrap", "gap-y-3"])}>
+                            {products.map((product, index) => (
+                                <div key={index} className={twMerge(["w-1/4", "px-3"])}>
+                                    <ProductCard product={product} />
                                 </div>
                             ))}
                         </div>
@@ -204,3 +181,74 @@ function ProductListPage() {
     );
 }
 export default ProductListPage;
+
+interface FilterBoxProps {
+    title: string;
+    data: { label: string; value: string }[];
+    type: "styles" | "genders";
+    selectedValue: string[];
+    onChange: (type: "styles" | "genders" | "sizes", value: string) => void;
+}
+
+function FilterBox({ title, data, type, selectedValue, onChange }: FilterBoxProps) {
+    return (
+        <div className={twMerge(["flex", "flex-col"])}>
+            {/*style 시작*/}
+            <div className={twMerge(["space-y-4"])}>
+                <h3 className={"font-bold text-sm"}>{title}</h3>
+                <div className={twMerge(["space-y-2", "pr-2"])}>
+                    {data.map((style, index) => (
+                        <label
+                            key={index}
+                            className={twMerge([
+                                "flex",
+                                "items-center",
+                                "gap-3",
+                                "cursor-pointer",
+                            ])}>
+                            {/*text 면 value checkbox면 checked*/}
+                            <input
+                                type={"checkbox"}
+                                className={" h-4 w-4 rounded"}
+                                checked={selectedValue.includes(style.value)}
+                                onChange={() => onChange(type, style.value)}
+                            />
+                            <span className={"text-sm text-gray-600"}>{style.label}</span>
+                        </label>
+                    ))}
+                </div>
+            </div>
+        </div>
+    );
+}
+
+interface FilterButtonBoxProps {
+    selectedSizes: string[];
+    onChange: (type: "styles" | "genders" | "sizes", value: string) => void;
+}
+function FilterButtonBox({ onChange, selectedSizes }: FilterButtonBoxProps) {
+    return (
+        <div className={twMerge(["flex", "flex-col"])}>
+            {/*style 시작*/}
+            <div className={twMerge(["space-y-4"])}>
+                <h3 className={"font-bold text-sm"}>사이즈</h3>
+                <div className={twMerge(["pr-2", "flex", "flex-wrap", "gap-2"])}>
+                    {FILTER_SIZES.map((item, index) => {
+                        const isSelected = selectedSizes.includes(item);
+                        return (
+                            <button
+                                key={index}
+                                className={twMerge(
+                                    ["text-xs", "py-2", "px-3", "border", "rounded-sm"],
+                                    isSelected && ["text-white", "bg-black"],
+                                )}
+                                onClick={() => onChange("sizes", item)}>
+                                {item}
+                            </button>
+                        );
+                    })}
+                </div>
+            </div>
+        </div>
+    );
+}
