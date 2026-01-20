@@ -20,10 +20,10 @@ export interface User {
     emailOptIn:boolean;
     smsOptIn:boolean;
     birthdate: string;
-    gender:"MALE" | "FEMALE";
-    zipCode?: string;
+    gender:"MALE" | "FEMALE";    zipCode?: string;
     address1?: string;
     address2?: string;
+
 }
 export interface LoginFormType {
     email: string;

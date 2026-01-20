@@ -12,7 +12,7 @@ function ProductCard({ product }: ProductCardProps) {
         <Link to={`/products/${product.id}`}
             className={twMerge(
                 ["group", "relative", "aspect-[3/4]", "overflow-hidden"],
-                ["flex", "flex-col", "gap-2","mt-4"],
+                ["flex", "flex-col", "gap-2"],
             )}>
             {/*이미지*/}
             {thumbnail ? (
