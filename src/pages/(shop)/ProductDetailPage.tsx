@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from "react-router";
-import { useEffect, useState } from "react";
-import type { Product } from "../../types/product.ts";
+import { type Dispatch, type SetStateAction, useEffect, useState } from "react";
+import type { Product, ProductImage } from "../../types/product.ts";
 import { getProduct } from "../../api/product.api.ts";
 import { twMerge } from "tailwind-merge";
 
@@ -58,7 +58,21 @@ function ProductDetailPage() {
             <div className={twMerge(["flex", "gap-14"])}>
                 {/*왼쪽 (이미지)*/}
                 <div className={twMerge(["w-2/3", "space-y-3"])}>
+                    {/*큰이미지*/}
                     <MainImageBox product={product} mainImage={mainImage} />
+                    {/*작은이미지*/}
+                    {currentColor && currentColor.images.length > 1 && (
+                        <div className={twMerge(["flex", "gap-2", "overflow-x-auto"])}>
+                            {currentColor.images.map((image, index) => (
+                                <ThumbnailBox
+                                    key={index}
+                                    image={image}
+                                    setMainImage={setMainImage}
+                                    mainImage={mainImage}
+                                />
+                            ))}
+                        </div>
+                    )}
                 </div>
                 {/*오른쪽 (상품 정보)*/}
                 <div className={twMerge(["w-1/3"])}></div>
@@ -95,14 +109,38 @@ function MainImageBox({ product, mainImage }: MainImageBoxProps) {
                 </div>
             )}
             {/*뱃지*/}
-            <div className={twMerge(["absolute","top-4","left-4"])}>
-                {product.isBest &&(
-                    <span className={twMerge(["bg-white","text-xs","font-bold","px-2","py-1"])}>Best</span>
+            <div className={twMerge(["absolute", "top-4", "left-4"])}>
+                {product.isBest && (
+                    <span className={twMerge(["bg-white", "text-xs", "font-bold", "px-2", "py-1"])}>
+                        Best
+                    </span>
                 )}
-                {product.isNew &&(
-                    <span className={twMerge(["bg-white","text-xs","font-bold","px-2","py-1"])}>New</span>
+                {product.isNew && (
+                    <span className={twMerge(["bg-white", "text-xs", "font-bold", "px-2", "py-1"])}>
+                        New
+                    </span>
                 )}
             </div>
         </div>
+    );
+}
+
+interface ThumbnailBoxProps {
+    image: ProductImage;
+    setMainImage: Dispatch<SetStateAction<string>>;
+    mainImage:string;
+}
+
+function ThumbnailBox({ image, setMainImage ,mainImage}: ThumbnailBoxProps) {
+    return (
+        <button
+            onMouseEnter={() => setMainImage(image.url)}
+            className={twMerge(
+                ["w-20", "h-24", "bg-gray-50", "overflow-hidden"],
+                ["border", ],
+                mainImage === image.url ? "border-black" :"border-transparent",
+            )}>
+            <img src={image.url} alt={"thumb"} className={"w-full h-full object-cover"} />
+        </button>
     );
 }
