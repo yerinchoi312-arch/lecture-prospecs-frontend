@@ -5,10 +5,14 @@ import { getProduct } from "../../api/product.api.ts";
 import { twMerge } from "tailwind-merge";
 import Button from "../../components/common/Button.tsx";
 import Accordion from "../../components/common/Accordion.tsx";
+import useCartStore from "../../store/useCartStore.ts";
+import useAuthStore from "../../store/useAuthStore.ts";
 
 function ProductDetailPage() {
     const { id } = useParams();
     const navigate = useNavigate();
+    const { addItem } = useCartStore();
+    const { isLoggedIn } = useAuthStore();
 
     const [loading, setLoading] = useState(true);
     const [product, setProduct] = useState<Product | null>(null);
@@ -53,6 +57,45 @@ function ProductDetailPage() {
 
     //화면에 출력해줄 정보는 color에 종속되어 있고, color가 굉장히 많은 정보를 갖고 있음
     const currentColor = product.colors.find(color => color.id === selectedColorId);
+
+    const handleAddToCart = async () => {
+        if (!isLoggedIn) {
+            const confirmLogin = window.confirm(
+                "로그인이 필요한 서비스입니다. 로그인 페이지로 이동하시겠습니까?",
+            );
+            navigate("/login");
+            if (!confirmLogin) {
+                navigate("/login");
+            }
+            return;
+        }
+        if(!selectedSize || !currentColor){
+            alert("사이즈를 선택해주세요.");
+            return;
+        }
+
+        //우리가 addCart에 전달해야 하는 정보는 sizeId,quantity
+        //selectedSize는 '230'이라는 값을 갖고 있는 state
+        const targetSizeObj = currentColor.sizes.find(size => size.size === selectedSize);
+        if(!targetSizeObj){
+            alert("유효하지 않은 사이즈입니다.")
+            return;
+        }
+        if (targetSizeObj.stock <= 0 ){
+            alert("품절된 상품입니다.")
+            return;
+        }
+
+        try{
+            await addItem(targetSizeObj.id,quantity)
+            if(window.confirm("장바구니에 상품을 담았습니다. 장바구니로 이동하시겠습니까?")){
+                navigate("/cart");
+            }
+        }catch (e) {
+            console.log(e);
+            alert("장바구니 담기에 실패했습니다.")
+        }
+    };
 
     return (
         <div className={twMerge(["w-full", "max-w-350", "py-10", "mx-auto"])}>
@@ -103,7 +146,7 @@ function ProductDetailPage() {
                     />
                     <div className={"flex flex-col gap-3"}>
                         <Button size={"lg"}>바로구매</Button>
-                        <Button size={"lg"} variant={"secondary"}>
+                        <Button size={"lg"} variant={"secondary"} onClick={handleAddToCart}>
                             장바구니
                         </Button>
                     </div>
@@ -116,8 +159,9 @@ function ProductDetailPage() {
                 </div>
             </div>
             {/*상품 상세*/}
-            <div className={twMerge(["mx-auto","max-w-215","mt-24"])}
-            dangerouslySetInnerHTML={{__html:product.description}}
+            <div
+                className={twMerge(["mx-auto", "max-w-215", "mt-24"])}
+                dangerouslySetInnerHTML={{ __html: product.description }}
             />
         </div>
     );
@@ -388,10 +432,10 @@ interface RightInformationBoxProps {
 
 function RightInformationBox({ product }: RightInformationBoxProps) {
     return (
-        <table className={twMerge(["w-full", "text-xs","text-left"])}>
+        <table className={twMerge(["w-full", "text-xs", "text-left"])}>
             <colgroup>
-                <col className={"w-40"}/>
-                <col/>
+                <col className={"w-40"} />
+                <col />
             </colgroup>
             <tbody>
                 <tr>
