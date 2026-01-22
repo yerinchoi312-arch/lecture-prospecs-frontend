@@ -20,40 +20,16 @@ function Button({
     //기본스타일
     const baseStyle = twMerge(
         ["flex", "justify-center", "items-center"],
-        ["font-bold"],
+        ["font-bold", "border"],
         ["transition-color", "focus:outline-none"],
         ["disabled:opacity-50", "disabled:cursor-not-allowed"],
     );
     //변형(색상)스타일
     const variants = {
-        primary: twMerge([
-            "bg-black",
-            "text-white",
-            "hover:bg-gray-800",
-            "border",
-            "border-transparent",
-        ]),
-        secondary: twMerge([
-            "bg-white",
-            "text-black",
-            "hover:bg-gray-500",
-            "border",
-            "border-gray-300",
-        ]),
-        outline: twMerge([
-            "bg-transparent",
-            "text-black",
-            "hover:bg-gray-100",
-            "border",
-            "border-black",
-        ]),
-        error: twMerge([
-            "bg-red-600",
-            "text-white",
-            "hover:bg-red-700",
-            "border",
-            "border-transparent",
-        ]),
+        primary: twMerge(["bg-black", "text-white", "hover:bg-gray-800", "border-transparent"]),
+        secondary: twMerge(["bg-white", "text-black", "hover:bg-gray-50", "border-gray-300"]),
+        outline: twMerge(["bg-transparent", "text-black", "hover:bg-gray-100", "border-black"]),
+        error: twMerge(["bg-red-600", "text-white", "hover:bg-red-700", "border-transparent"]),
         ghost: twMerge(["bg-transparent", "text-gray-500", "hover:text-black", "border-none"]),
     };
     //변형(크기)스타일
