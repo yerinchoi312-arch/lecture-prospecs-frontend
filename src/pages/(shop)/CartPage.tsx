@@ -4,10 +4,12 @@ import useAuthStore from "../../store/useAuthStore.ts";
 import { useEffect } from "react";
 import { twMerge } from "tailwind-merge";
 import { FiMinus, FiPlus, FiX } from "react-icons/fi";
+import { useOrderStore } from "../../store/useOrderStore.ts";
 
 function CartPage() {
     const navigate = useNavigate();
     const { items, loading, fetchCart, updateQuantity, removeItem, getTotalPrice } = useCartStore();
+    const{setOrderItems}=useOrderStore();
     const { isLoggedIn } = useAuthStore();
 
     useEffect(() => {
@@ -34,7 +36,7 @@ function CartPage() {
             alert("주문할 상품이 없습니다.")
             return;
         }
-
+        setOrderItems(items);
         navigate("/order")
     }
 
